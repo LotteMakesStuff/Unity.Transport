@@ -1,4 +1,4 @@
-#if UNITY_2020_1_OR_NEWER
+#if UNITY_2019_4
 #define UNITY_TRANSPORT_ENABLE_BASELIB
 #endif
 #if UNITY_TRANSPORT_ENABLE_BASELIB
@@ -25,6 +25,11 @@ namespace Unity.Networking.Transport
         public int receiveQueueCapacity;
         public int sendQueueCapacity;
         public uint maximumPayloadSize;
+    }
+    
+    public struct BaselibDefaultListenPortNetworkParameter : INetworkParameter
+    {
+        public ushort defaultPort;
     }
 
     [BurstCompile]
@@ -174,6 +179,8 @@ namespace Unity.Networking.Transport
             txQueueSize = k_defaultTxQueueSize;
             maximumPayloadSize = NetworkParameterConstants.MTU;
 
+            ushort defaultPort = 0;
+            
             for (int i = 0; i < param.Length; ++i)
             {
                 if (param[i] is BaselibNetworkParameter)
@@ -182,6 +189,11 @@ namespace Unity.Networking.Transport
                     rxQueueSize = config.receiveQueueCapacity;
                     txQueueSize = config.sendQueueCapacity;
                     maximumPayloadSize = config.maximumPayloadSize;
+                }
+                else if (param[i] is BaselibDefaultListenPortNetworkParameter)
+                {
+                    var config = (BaselibDefaultListenPortNetworkParameter) param[i];
+                    defaultPort = config.defaultPort;
                 }
             }
 
@@ -194,7 +206,7 @@ namespace Unity.Networking.Transport
             m_Baselib[0] = baselib;
 
             // Emulate current interface behavior
-            NetworkInterfaceEndPoint ep = CreateInterfaceEndPoint(NetworkEndPoint.AnyIpv4);
+            NetworkInterfaceEndPoint ep = CreateInterfaceEndPoint(NetworkEndPoint.AnyIpv4.WithPort(defaultPort));
             if (Bind(ep) != 0)
                 throw new Exception("Could not bind socket");
         }

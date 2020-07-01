@@ -1,4 +1,4 @@
-#if UNITY_2020_1_OR_NEWER
+#if UNITY_2019_4
 #define UNITY_TRANSPORT_ENABLE_BASELIB
 #endif
 using System;
@@ -802,7 +802,7 @@ namespace Unity.Networking.Transport
                 return default(NetworkConnection);
             return new NetworkConnection {m_NetworkId = id, m_NetworkVersion = m_ConnectionList[id].Version};
         }
-
+        
         public NetworkConnection Connect(NetworkEndPoint endpoint)
         {
             var ifEndPoint = s_NetworkInterfaces[m_NetworkInterfaceIndex].CreateInterfaceEndPoint(endpoint);
